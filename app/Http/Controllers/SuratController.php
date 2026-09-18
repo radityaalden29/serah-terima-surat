@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SuratTemplateExport;
+use App\Imports\SuratImport;
+use App\Models\ActivityLog;
 use App\Models\Surat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SuratController extends Controller
 {
@@ -27,12 +31,45 @@ class SuratController extends Controller
 
         $surats = Surat::latest()->take(5)->get();
 
+        // ===== Tren dibanding bulan lalu =====
+        $semuaSurat = Surat::all(['tanggal', 'status']);
+
+        $bulanIni  = now()->format('Y-m');
+        $bulanLalu = now()->copy()->subMonth()->format('Y-m');
+
+        $hitungBulan = function ($statusFilter, $bulanKey) use ($semuaSurat) {
+            return $semuaSurat->filter(function ($s) use ($statusFilter, $bulanKey) {
+                $cocokBulan = \Carbon\Carbon::parse($s->tanggal)->format('Y-m') === $bulanKey;
+                $cocokStatus = $statusFilter ? $s->status === $statusFilter : true;
+                return $cocokBulan && $cocokStatus;
+            })->count();
+        };
+
+        $trenTotal    = $this->hitungPersenTren($hitungBulan(null, $bulanIni), $hitungBulan(null, $bulanLalu));
+        $trenDiterima = $this->hitungPersenTren($hitungBulan('Diterima', $bulanIni), $hitungBulan('Diterima', $bulanLalu));
+        $trenSelesai  = $this->hitungPersenTren($hitungBulan('Selesai', $bulanIni), $hitungBulan('Selesai', $bulanLalu));
+
         return view('dashboard.index', compact(
             'totalSurat',
             'diterima',
             'selesai',
-            'surats'
+            'surats',
+            'trenTotal',
+            'trenDiterima',
+            'trenSelesai'
         ));
+    }
+
+    /**
+     * Hitung persentase perubahan antara angka bulan ini vs bulan lalu.
+     */
+    private function hitungPersenTren(int $sekarang, int $lalu): int
+    {
+        if ($lalu === 0) {
+            return $sekarang > 0 ? 100 : 0;
+        }
+
+        return (int) round((($sekarang - $lalu) / $lalu) * 100);
     }
 
     /*
@@ -101,13 +138,33 @@ class SuratController extends Controller
 
     /*
     |--------------------------------------------------------------------------
+    | Helper: Daftar Instansi (untuk autocomplete Pengirim/Penerima)
+    |--------------------------------------------------------------------------
+    */
+
+    private function daftarInstansi()
+    {
+        $pengirim = Surat::query()->distinct()->pluck('pengirim');
+        $penerima = Surat::query()->distinct()->pluck('penerima');
+
+        return $pengirim->merge($penerima)
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
     | Form Tambah
     |--------------------------------------------------------------------------
     */
 
     public function create()
     {
-        return view('surat.create');
+        $daftarInstansi = $this->daftarInstansi();
+
+        return view('surat.create', compact('daftarInstansi'));
     }
 
     /*
@@ -139,6 +196,12 @@ class SuratController extends Controller
 
     Surat::create($data);
 
+    ActivityLog::create([
+        'aksi' => ActivityLog::AKSI_TAMBAH,
+        'no_agenda' => $data['no_agenda'],
+        'keterangan' => "Surat dari \"{$data['pengirim']}\" untuk \"{$data['penerima']}\" ditambahkan.",
+    ]);
+
     return redirect()
         ->route('surat.index')
         ->with('success', 'Surat berhasil ditambahkan.');
@@ -167,7 +230,9 @@ class SuratController extends Controller
 
     public function edit(Surat $surat)
     {
-        return view('surat.edit', compact('surat'));
+        $daftarInstansi = $this->daftarInstansi();
+
+        return view('surat.edit', compact('surat', 'daftarInstansi'));
     }
 
     /*
@@ -204,6 +269,12 @@ class SuratController extends Controller
 
     $surat->update($data);
 
+    ActivityLog::create([
+        'aksi' => ActivityLog::AKSI_UBAH,
+        'no_agenda' => $surat->no_agenda,
+        'keterangan' => "Data surat \"{$surat->perihal}\" diperbarui.",
+    ]);
+
     return redirect()
         ->route('surat.index')
         ->with('success', 'Surat berhasil diperbarui.');
@@ -218,11 +289,20 @@ class SuratController extends Controller
     public function destroy(Surat $surat)
 {
     try {
+        $noAgenda = $surat->no_agenda;
+        $perihal = $surat->perihal;
+
         if ($surat->lampiran) {
             Storage::disk('public')->delete($surat->lampiran);
         }
 
         $surat->delete();
+
+        ActivityLog::create([
+            'aksi' => ActivityLog::AKSI_HAPUS,
+            'no_agenda' => $noAgenda,
+            'keterangan' => "Surat \"{$perihal}\" dihapus dari sistem.",
+        ]);
 
         return redirect()
             ->route('surat.index')
@@ -248,5 +328,74 @@ class SuratController extends Controller
         $surats = Surat::latest()->get();
 
         return view('laporan.index', compact('surats'));
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Import Excel
+    |--------------------------------------------------------------------------
+    */
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        $import = new SuratImport();
+
+        try {
+            Excel::import($import, $request->file('file'));
+        } catch (\Exception $e) {
+            return redirect()
+                ->route('surat.index')
+                ->with('error', 'Gagal membaca file. Pastikan format file sesuai template.');
+        }
+
+        $jumlahBerhasil = $import->imported;
+        $jumlahDuplikat = $import->duplikat;
+        $jumlahGagal = $import->failures()->count();
+
+        if ($jumlahBerhasil > 0) {
+            ActivityLog::create([
+                'aksi' => ActivityLog::AKSI_IMPOR,
+                'no_agenda' => '-',
+                'keterangan' => "{$jumlahBerhasil} surat berhasil diimpor dari file Excel/CSV.",
+            ]);
+        }
+
+        $pesan = "{$jumlahBerhasil} surat berhasil diimpor.";
+
+        if ($jumlahDuplikat > 0) {
+            $pesan .= " {$jumlahDuplikat} baris dilewati karena No Agenda sudah ada.";
+        }
+
+        if ($jumlahGagal > 0) {
+            $pesan .= " {$jumlahGagal} baris dilewati karena data tidak lengkap.";
+        }
+
+        if ($jumlahBerhasil === 0) {
+            return redirect()->route('surat.index')->with('error', $pesan);
+        }
+
+        return redirect()->route('surat.index')->with('success', $pesan);
+    }
+
+    public function downloadTemplate()
+    {
+        return Excel::download(new SuratTemplateExport, 'template-import-surat.xlsx');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Log Aktivitas
+    |--------------------------------------------------------------------------
+    */
+
+    public function activityLog()
+    {
+        $logs = ActivityLog::latest()->paginate(15);
+
+        return view('log-aktivitas.index', compact('logs'));
     }
 }

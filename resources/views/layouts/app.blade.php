@@ -115,6 +115,19 @@
 
             </li>
 
+            <li>
+
+                <a href="{{ route('log-aktivitas') }}"
+                   class="{{ request()->routeIs('log-aktivitas') ? 'active' : '' }}">
+
+                    <i class="bi bi-clock-history"></i>
+
+                    Log Aktivitas
+
+                </a>
+
+            </li>
+
            <li>
 
     <a href="{{ route('tentang') }}"
@@ -212,6 +225,11 @@
                     $breadcrumbs = [
                         ['label' => 'Dashboard', 'icon' => 'bi-house-door-fill', 'url' => route('dashboard')],
                         ['label' => 'Laporan', 'url' => null],
+                    ];
+                } elseif (request()->routeIs('log-aktivitas')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'icon' => 'bi-house-door-fill', 'url' => route('dashboard')],
+                        ['label' => 'Log Aktivitas', 'url' => null],
                     ];
                 } elseif (request()->routeIs('tentang')) {
                     $breadcrumbs = [
@@ -420,12 +438,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const progress = Math.min((now - startTime) / duration, 1);
             const eased = 1 - Math.pow(1 - progress, 3);
 
-            el.textContent = Math.floor(eased * target);
+            const nilai = Math.floor(eased * target);
+            el.textContent = nilai.toLocaleString('id-ID');
 
             if (progress < 1) {
                 requestAnimationFrame(tick);
             } else {
-                el.textContent = target;
+                el.textContent = target.toLocaleString('id-ID');
             }
         }
 

@@ -55,6 +55,73 @@
 
 </form>
 
+@php
+    if (!function_exists('suratAvatarColor')) {
+        function suratAvatarColor($name) {
+            $colors = ['#7b4fc7','#2f9e44','#e8590c','#1971c2','#c2255c','#0ca678','#f08c00','#5f3dc4'];
+            $hash = 0;
+            foreach (str_split((string) $name) as $char) {
+                $hash = ord($char) + (($hash << 5) - $hash);
+            }
+            return $colors[abs($hash) % count($colors)];
+        }
+    }
+
+    if (!function_exists('suratInitials')) {
+        function suratInitials($name) {
+            $words = preg_split('/\s+/', trim((string) $name));
+            $initials = mb_strtoupper(mb_substr($words[0] ?? '', 0, 1));
+            if (count($words) > 1) {
+                $initials .= mb_strtoupper(mb_substr(end($words), 0, 1));
+            }
+            return $initials !== '' ? $initials : '?';
+        }
+    }
+@endphp
+
+<div class="row g-4 mb-4">
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-graph-up-arrow me-1"></i> Tren Surat 12 Bulan Terakhir</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="chartTrenBulanan" height="220"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-building me-1"></i> Instansi Paling Sering Kirim Surat</h5>
+            </div>
+            <div class="card-body">
+
+                @forelse($statistikInstansi as $item)
+                    <div class="ranking-item">
+                        <div class="ranking-label">
+                            <span class="avatar-circle" style="background:{{ suratAvatarColor($item->pengirim) }}">
+                                {{ suratInitials($item->pengirim) }}
+                            </span>
+                            <span>{{ $item->pengirim }}</span>
+                        </div>
+                        <div class="ranking-bar-wrapper">
+                            <div class="ranking-bar" style="width:{{ ($item->jumlah / $maxInstansi) * 100 }}%"></div>
+                        </div>
+                        <span class="ranking-count">{{ number_format($item->jumlah, 0, ',', '.') }}</span>
+                    </div>
+                @empty
+                    <p class="text-muted text-center mb-0">Belum ada data.</p>
+                @endforelse
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
 <div class="card shadow border-0">
 
     <div class="card-header bg-white">
@@ -108,3 +175,45 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const canvas = document.getElementById('chartTrenBulanan');
+    if (!canvas || !window.Chart) return;
+
+    new window.Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: @json($labelBulan),
+            datasets: [{
+                label: 'Jumlah Surat',
+                data: @json($dataBulan),
+                backgroundColor: '#7b4fc7',
+                borderRadius: 6,
+                maxBarThickness: 32
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+
+});
+</script>
+@endpush

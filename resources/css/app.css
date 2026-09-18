@@ -79,6 +79,36 @@ body{
 
     transition:background-color .3s ease, color .3s ease;
 
+    scrollbar-width:thin;
+    scrollbar-color:var(--primary-light) transparent;
+
+}
+
+/* Custom scrollbar (Chrome, Edge, Safari) */
+::-webkit-scrollbar{
+    width:9px;
+    height:9px;
+}
+
+::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+::-webkit-scrollbar-thumb{
+    background:var(--primary-light);
+    border-radius:999px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background:var(--primary);
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.4);
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover{
+    background:rgba(255,255,255,.6);
 }
 
 a{
@@ -521,6 +551,37 @@ p{
     color:#868e96;
 }
 
+.card-info-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.trend-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:2px;
+
+    padding:3px 9px;
+    border-radius:999px;
+
+    font-size:12.5px;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.trend-badge--up{
+    background:#e3f5ea;
+    color:#1f8a4c;
+}
+
+.trend-badge--down{
+    background:#fde8ea;
+    color:#c53040;
+}
+
 /* =====================================================
    BUTTON — GLOBAL
 ===================================================== */
@@ -727,6 +788,38 @@ p{
 
 }
 
+/* Custom dropdown arrow senada tema */
+.form-select{
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237b4fc7' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 16px center;
+    background-size:12px 8px;
+
+    padding-right:42px;
+}
+
+/* Checkbox & radio ikut warna tema */
+.form-check-input{
+    accent-color:var(--primary);
+    width:1.15em;
+    height:1.15em;
+    cursor:pointer;
+}
+
+.form-check-input:focus{
+    box-shadow:0 0 0 .2rem rgba(123,79,199,.15);
+    border-color:var(--primary);
+}
+
+.form-check-label{
+    cursor:pointer;
+    padding-left:2px;
+}
+
 /* Textarea */
 
 textarea.form-control{
@@ -764,6 +857,10 @@ textarea.form-control{
     font-size:15.5px;
 
     color:var(--text);
+
+    position:sticky;
+    top:0;
+    z-index:2;
 
 }
 
@@ -977,6 +1074,17 @@ textarea.form-control{
     color:#166b3a;
 }
 
+.btn-soft-primary{
+    background:#efe8ff;
+    color:var(--primary-dark);
+    border:none;
+}
+
+.btn-soft-primary:hover{
+    background:#e0d4fa;
+    color:var(--primary-dark);
+}
+
 .btn-ghost{
     background:#f1f2f4;
     color:#5a5c60;
@@ -1163,6 +1271,9 @@ textarea.form-control{
     padding:25px 20px;
     color:#fff;
     background:linear-gradient(180deg,var(--primary),var(--primary-light));
+
+    scrollbar-width:thin;
+    scrollbar-color:rgba(255,255,255,.4) transparent;
 }
 
 /* =====================================================
@@ -1509,6 +1620,157 @@ textarea.form-control{
     color:var(--muted);
     font-size:15px;
     line-height:1.6;
+}
+
+/* =====================================================
+   LOG AKTIVITAS
+===================================================== */
+
+.log-item{
+    display:flex;
+    gap:16px;
+
+    padding:18px 0;
+    border-bottom:1px solid var(--border-color);
+
+    opacity:0;
+    transform:translateY(10px);
+    animation:logFadeIn .4s ease forwards;
+}
+
+.log-item:last-child{
+    border-bottom:none;
+}
+
+@keyframes logFadeIn{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.log-icon{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    flex-shrink:0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:17px;
+    color:#fff;
+}
+
+.log-icon--ditambahkan{ background:#2f9e44; }
+.log-icon--diperbarui{ background:#1971c2; }
+.log-icon--dihapus{ background:#e03131; }
+.log-icon--diimpor{ background:var(--primary); }
+
+.log-content{
+    flex:1;
+}
+
+.log-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:4px;
+}
+
+.log-aksi-badge{
+    font-size:12.5px;
+    font-weight:700;
+    padding:3px 12px;
+    border-radius:999px;
+    color:#fff;
+}
+
+.log-aksi-badge--ditambahkan{ background:#2f9e44; }
+.log-aksi-badge--diperbarui{ background:#1971c2; }
+.log-aksi-badge--dihapus{ background:#e03131; }
+.log-aksi-badge--diimpor{ background:var(--primary); }
+
+.log-no-agenda{
+    font-weight:600;
+    color:var(--text);
+}
+
+.log-keterangan{
+    margin:0 0 4px;
+    color:var(--text);
+    font-size:15px;
+}
+
+.log-waktu{
+    font-size:13px;
+    color:var(--muted);
+}
+
+/* =====================================================
+   RANKING INSTANSI (Laporan)
+===================================================== */
+
+.ranking-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:10px 0;
+    border-bottom:1px solid var(--border-color);
+}
+
+.ranking-item:last-child{
+    border-bottom:none;
+}
+
+.ranking-label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    width:140px;
+    flex-shrink:0;
+
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.ranking-bar-wrapper{
+    flex:1;
+    height:10px;
+    border-radius:999px;
+    background:var(--table-header-bg);
+    overflow:hidden;
+}
+
+.ranking-bar{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--primary), var(--primary-light));
+
+    animation:rankingGrow 1s ease forwards;
+    transform-origin:left;
+}
+
+@keyframes rankingGrow{
+    from{ transform:scaleX(0); }
+    to{ transform:scaleX(1); }
+}
+
+.ranking-count{
+    width:28px;
+    flex-shrink:0;
+    text-align:right;
+    font-weight:700;
+    color:var(--primary);
+    font-size:14px;
 }
 
 /* =====================================================
@@ -2110,4 +2372,55 @@ textarea.form-control{
     color:#fff;
     transform:translateY(-2px);
     box-shadow:0 10px 20px rgba(123,79,199,.3);
+}
+
+/* =====================================================
+   PRINT STYLESHEET
+===================================================== */
+
+@media print{
+
+    .sidebar,
+    .topbar,
+    .breadcrumb-nav,
+    .btn-tambah,
+    .btn,
+    .laporan-action,
+    form,
+    .sidebar-toggle-btn,
+    .sidebar-overlay,
+    .theme-toggle-btn,
+    .loading-screen{
+        display:none !important;
+    }
+
+    .main-content{
+        margin-left:0 !important;
+        width:100% !important;
+    }
+
+    .content{
+        padding:0 !important;
+        animation:none !important;
+    }
+
+    body{
+        background:#fff !important;
+        color:#000 !important;
+    }
+
+    .card{
+        box-shadow:none !important;
+        border:1px solid #ccc !important;
+    }
+
+    .table thead th{
+        background:#eee !important;
+        color:#000 !important;
+        position:static !important;
+    }
+
+    .table td{
+        color:#000 !important;
+    }
 }

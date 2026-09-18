@@ -28,7 +28,13 @@
                 <small>Total Surat</small>
                 <h2 class="count-up" data-target="{{ $totalSurat }}">0</h2>
             </div>
-            <span class="card-info">Semua data surat masuk</span>
+            <div class="card-info-row">
+                <span class="card-info">Semua data surat masuk</span>
+                <span class="trend-badge trend-badge--{{ $trenTotal >= 0 ? 'up' : 'down' }}">
+                    <i class="bi bi-arrow-{{ $trenTotal >= 0 ? 'up' : 'down' }}-short"></i>
+                    {{ abs($trenTotal) }}%
+                </span>
+            </div>
         </div>
     </div>
 
@@ -39,7 +45,13 @@
                 <small>Diterima</small>
                 <h2 class="count-up" data-target="{{ $diterima }}">0</h2>
             </div>
-            <span class="card-info">Belum melewati tanggal surat</span>
+            <div class="card-info-row">
+                <span class="card-info">Belum melewati tanggal surat</span>
+                <span class="trend-badge trend-badge--{{ $trenDiterima >= 0 ? 'up' : 'down' }}">
+                    <i class="bi bi-arrow-{{ $trenDiterima >= 0 ? 'up' : 'down' }}-short"></i>
+                    {{ abs($trenDiterima) }}%
+                </span>
+            </div>
         </div>
     </div>
 
@@ -50,7 +62,13 @@
                 <small>Selesai</small>
                 <h2 class="count-up" data-target="{{ $selesai }}">0</h2>
             </div>
-            <span class="card-info">Sudah melewati tanggal surat</span>
+            <div class="card-info-row">
+                <span class="card-info">Sudah melewati tanggal surat</span>
+                <span class="trend-badge trend-badge--{{ $trenSelesai >= 0 ? 'up' : 'down' }}">
+                    <i class="bi bi-arrow-{{ $trenSelesai >= 0 ? 'up' : 'down' }}-short"></i>
+                    {{ abs($trenSelesai) }}%
+                </span>
+            </div>
         </div>
     </div>
 
