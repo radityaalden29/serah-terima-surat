@@ -157,14 +157,56 @@
 
 @push('scripts')
 <script>
-document.querySelector('form').addEventListener('submit', function () {
+(function () {
+    const form = document.querySelector('form');
+    let formDirty = false;
+    let formSubmitting = false;
 
-    const btn = document.getElementById('btnSimpan');
+    // Tandai form sudah diubah saat ada input apapun
+    form.addEventListener('input', () => { formDirty = true; });
+    form.addEventListener('change', () => { formDirty = true; });
 
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Menyimpan...';
+    // Saat submit — jangan tampilkan dialog
+    form.addEventListener('submit', function () {
+        formSubmitting = true;
+        const btn = document.getElementById('btnSimpan');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Menyimpan...';
+    });
 
-});
+    // Klik tombol Batal / Kembali
+    document.querySelectorAll('a[href]').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            if (!formDirty || formSubmitting) return;
+            e.preventDefault();
+            const target = this.href;
+            Swal.fire({
+                title: 'Tinggalkan halaman?',
+                text: 'Perubahan yang belum disimpan akan hilang.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, tinggalkan',
+                cancelButtonText: 'Tetap di sini',
+                confirmButtonColor: '#7b4fc7',
+                cancelButtonColor: '#6c757d',
+                reverseButtons: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    formDirty = false;
+                    window.location.href = target;
+                }
+            });
+        });
+    });
+
+    // Peringatan browser-native saat refresh/tutup tab
+    window.addEventListener('beforeunload', function (e) {
+        if (formDirty && !formSubmitting) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+})();
 </script>
 @endpush
 

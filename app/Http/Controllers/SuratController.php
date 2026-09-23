@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ActivityLogExport;
 use App\Exports\SuratTemplateExport;
 use App\Imports\SuratImport;
 use App\Models\ActivityLog;
@@ -49,6 +50,9 @@ class SuratController extends Controller
         $trenDiterima = $this->hitungPersenTren($hitungBulan('Diterima', $bulanIni), $hitungBulan('Diterima', $bulanLalu));
         $trenSelesai  = $this->hitungPersenTren($hitungBulan('Selesai', $bulanIni), $hitungBulan('Selesai', $bulanLalu));
 
+        // Surat yang tanggalnya HARI INI — akan otomatis jadi Selesai
+        $selesaiHariIni = Surat::whereDate('tanggal', now()->toDateString())->get();
+
         return view('dashboard.index', compact(
             'totalSurat',
             'diterima',
@@ -56,7 +60,8 @@ class SuratController extends Controller
             'surats',
             'trenTotal',
             'trenDiterima',
-            'trenSelesai'
+            'trenSelesai',
+            'selesaiHariIni'
         ));
     }
 
@@ -392,10 +397,34 @@ class SuratController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    public function activityLog()
+    public function activityLog(Request $request)
     {
-        $logs = ActivityLog::latest()->paginate(15);
+        $aksi   = $request->aksi;
+        $search = $request->search;
 
-        return view('log-aktivitas.index', compact('logs'));
+        $logs = ActivityLog::query()
+            ->when($aksi,   fn ($q) => $q->where('aksi', $aksi))
+            ->when($search, fn ($q) => $q->where('no_agenda', 'like', "%{$search}%"))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $stats = [
+            'total'       => ActivityLog::count(),
+            'ditambahkan' => ActivityLog::where('aksi', ActivityLog::AKSI_TAMBAH)->count(),
+            'diperbarui'  => ActivityLog::where('aksi', ActivityLog::AKSI_UBAH)->count(),
+            'dihapus'     => ActivityLog::where('aksi', ActivityLog::AKSI_HAPUS)->count(),
+            'diimpor'     => ActivityLog::where('aksi', ActivityLog::AKSI_IMPOR)->count(),
+        ];
+
+        return view('log-aktivitas.index', compact('logs', 'stats'));
+    }
+
+    public function activityLogExport(Request $request)
+    {
+        return Excel::download(
+            new ActivityLogExport($request->aksi, $request->search),
+            'log-aktivitas.xlsx'
+        );
     }
 }

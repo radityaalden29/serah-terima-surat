@@ -16,14 +16,45 @@
 
             <div class="row g-3">
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Dari Tanggal</label>
                     <input type="date" name="tanggal_awal" class="form-control" value="{{ request('tanggal_awal') }}">
                 </div>
 
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label fw-semibold">Sampai Tanggal</label>
                     <input type="date" name="tanggal_akhir" class="form-control" value="{{ request('tanggal_akhir') }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Pengirim</label>
+                    <input type="text" name="pengirim" class="form-control" list="listPengirim"
+                           placeholder="Semua pengirim" value="{{ request('pengirim') }}">
+                    <datalist id="listPengirim">
+                        @foreach($daftarPengirim as $p)
+                            <option value="{{ $p }}">
+                        @endforeach
+                    </datalist>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Penerima</label>
+                    <input type="text" name="penerima" class="form-control" list="listPenerima"
+                           placeholder="Semua penerima" value="{{ request('penerima') }}">
+                    <datalist id="listPenerima">
+                        @foreach($daftarPenerima as $p)
+                            <option value="{{ $p }}">
+                        @endforeach
+                    </datalist>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="Diterima" {{ request('status') == 'Diterima' ? 'selected' : '' }}>Diterima</option>
+                        <option value="Selesai"  {{ request('status') == 'Selesai'  ? 'selected' : '' }}>Selesai</option>
+                    </select>
                 </div>
 
                 <div class="col-12">
@@ -113,7 +144,10 @@
                         <span class="ranking-count">{{ number_format($item->jumlah, 0, ',', '.') }}</span>
                     </div>
                 @empty
-                    <p class="text-muted text-center mb-0">Belum ada data.</p>
+                    <div class="empty-state" style="padding:30px 20px;">
+                        <div class="empty-state-icon sm"><i class="bi bi-building"></i></div>
+                        <p class="empty-state-text mb-0">Belum ada data instansi.</p>
+                    </div>
                 @endforelse
 
             </div>
@@ -164,7 +198,16 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center text-muted">Belum ada data laporan surat.</td>
+                        <td colspan="6" class="p-0">
+                            <div class="empty-state">
+                                <div class="empty-state-icon"><i class="bi bi-funnel"></i></div>
+                                <h5 class="empty-state-title">Tidak Ada Hasil</h5>
+                                <p class="empty-state-text">Tidak ada surat yang cocok dengan filter yang dipilih.</p>
+                                <a href="{{ route('laporan') }}" class="btn btn-ghost mt-2">
+                                    <i class="bi bi-arrow-clockwise me-1"></i> Reset Filter
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                 @endforelse
                 </tbody>

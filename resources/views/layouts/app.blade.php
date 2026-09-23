@@ -11,15 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 
-    <script>
-        (function () {
-            var savedTheme = localStorage.getItem('sistera-theme');
-            if (savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', 'dark');
-            }
-        })();
-    </script>
-
     @vite([
         'resources/css/app.css',
         'resources/js/app.js'
@@ -171,10 +162,6 @@
 
             <div class="topbar-right d-flex align-items-center gap-3">
 
-              <button type="button" class="theme-toggle-btn" id="themeToggle" title="Ganti Tema Gelap/Terang">
-                  <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
-              </button>
-
               <div class="date-box d-flex align-items-center gap-2">
 
     <i class="bi bi-calendar-event"></i>
@@ -262,11 +249,52 @@
 
             @yield('content')
 
-            <footer class="text-center mt-5 mb-3 text-muted">
+            <footer class="site-footer">
+                <div class="site-footer__inner">
 
-    © {{ date('Y') }} SISTERA - Sistem Informasi Serah Terima Surat
+                    {{-- Brand --}}
+                    <div class="site-footer__brand">
+                        <div class="site-footer__brand-top">
+                            <img src="{{ asset('images/logo-sistera.png') }}" alt="Logo SISTERA" class="site-footer__logo">
+                            <div>
+                                <div class="site-footer__name">SISTERA</div>
+                                <div class="site-footer__tagline">Universitas Pakuan</div>
+                            </div>
+                        </div>
+                        <p class="site-footer__desc">
+                            Sistem Informasi Serah Terima Surat — pengelolaan surat masuk secara digital, cepat, dan terdokumentasi.
+                        </p>
+                    </div>
 
-</footer>
+                    {{-- Link Groups --}}
+                    <div class="site-footer__links">
+                        <div class="site-footer__group">
+                            <div class="site-footer__group-title">Menu Utama</div>
+                            <a href="{{ route('dashboard') }}"    class="site-footer__link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+                            <a href="{{ route('surat.index') }}"  class="site-footer__link"><i class="bi bi-folder-fill"></i> Data Surat</a>
+                            <a href="{{ route('surat.create') }}" class="site-footer__link"><i class="bi bi-plus-circle-fill"></i> Tambah Surat</a>
+                        </div>
+                        <div class="site-footer__group">
+                            <div class="site-footer__group-title">Fitur Lain</div>
+                            <a href="{{ route('laporan') }}"       class="site-footer__link"><i class="bi bi-bar-chart-fill"></i> Laporan</a>
+                            <a href="{{ route('log-aktivitas') }}" class="site-footer__link"><i class="bi bi-clock-history"></i> Log Aktivitas</a>
+                            <a href="{{ route('tentang') }}"       class="site-footer__link"><i class="bi bi-info-circle-fill"></i> Tentang</a>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="site-footer__divider">
+
+                <div class="site-footer__bottom">
+                    <span class="site-footer__copy">
+                        © {{ date('Y') }} <strong>SISTERA</strong> &mdash; Sistem Informasi Serah Terima Surat
+                    </span>
+                    <span class="site-footer__version">
+                        <i class="bi bi-tag-fill"></i> v1.5
+                    </span>
+                </div>
+            </footer>
 
         </section>
 
@@ -392,39 +420,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         greetingEl.textContent = greeting;
-    }
-
-    // ===== Dark Mode Toggle =====
-    const themeToggle = document.getElementById('themeToggle');
-    const themeIcon = document.getElementById('themeIcon');
-    const htmlEl = document.documentElement;
-
-    function setThemeIcon() {
-        if (htmlEl.getAttribute('data-theme') === 'dark') {
-            themeIcon.classList.remove('bi-moon-stars-fill');
-            themeIcon.classList.add('bi-sun-fill');
-        } else {
-            themeIcon.classList.remove('bi-sun-fill');
-            themeIcon.classList.add('bi-moon-stars-fill');
-        }
-    }
-
-    setThemeIcon();
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', function () {
-            const isDark = htmlEl.getAttribute('data-theme') === 'dark';
-
-            if (isDark) {
-                htmlEl.removeAttribute('data-theme');
-                localStorage.setItem('sistera-theme', 'light');
-            } else {
-                htmlEl.setAttribute('data-theme', 'dark');
-                localStorage.setItem('sistera-theme', 'dark');
-            }
-
-            setThemeIcon();
-        });
     }
 
     // ===== Counting-up animation untuk angka statistik =====

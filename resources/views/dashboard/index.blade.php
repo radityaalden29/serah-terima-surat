@@ -19,6 +19,32 @@
     </div>
 </div>
 
+@if($selesaiHariIni->count() > 0)
+<div class="notif-box mb-4">
+    <div class="notif-icon">
+        <i class="bi bi-bell-fill"></i>
+    </div>
+    <div>
+        <strong>{{ $selesaiHariIni->count() }} surat</strong> akan otomatis berstatus
+        <strong>Selesai</strong> hari ini karena tanggal suratnya jatuh hari ini.
+        <div class="mt-2 d-flex flex-wrap gap-2">
+            @foreach($selesaiHariIni->take(5) as $s)
+                <a href="{{ route('surat.show', $s->id) }}"
+                   class="badge text-decoration-none"
+                   style="background:#fff1cc;color:#a36200;font-size:13px;padding:6px 12px;border-radius:999px;">
+                    {{ $s->no_agenda }}
+                </a>
+            @endforeach
+            @if($selesaiHariIni->count() > 5)
+                <span class="badge" style="background:#ffe8b0;color:#a36200;font-size:13px;padding:6px 12px;border-radius:999px;">
+                    +{{ $selesaiHariIni->count() - 5 }} lainnya
+                </span>
+            @endif
+        </div>
+    </div>
+</div>
+@endif
+
 <div class="row g-4 mb-5">
 
     <div class="col-lg-4 col-md-6">
@@ -169,6 +195,9 @@
                                 <div class="empty-state-icon sm"><i class="bi bi-inbox"></i></div>
                                 <h5 class="empty-state-title">Belum Ada Aktivitas</h5>
                                 <p class="empty-state-text">Surat yang baru ditambahkan akan muncul di sini.</p>
+                                <a href="{{ route('surat.create') }}" class="btn-tambah-sm">
+                                    <i class="bi bi-plus-circle"></i> Tambah Surat Pertama
+                                </a>
                             </div>
                         </td>
                     </tr>

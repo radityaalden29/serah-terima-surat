@@ -10,7 +10,13 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [SuratController::class, 'dashboard'])->name('dashboard');
 
+Route::get('/surat/template', [SuratController::class, 'downloadTemplate'])->name('surat.template');
+Route::post('/surat/import', [SuratController::class, 'import'])->name('surat.import');
+
 Route::resource('surat', SuratController::class);
+
+Route::get('/log-aktivitas', [SuratController::class, 'activityLog'])->name('log-aktivitas');
+Route::get('/log-aktivitas/export', [SuratController::class, 'activityLogExport'])->name('log-aktivitas.export');
 
 Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan');
 

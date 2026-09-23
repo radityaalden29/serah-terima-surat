@@ -97,12 +97,22 @@
                         <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
                         <h5 class="empty-state-title">Belum Ada Data Surat</h5>
                         <p class="empty-state-text">
-                            Surat masuk maupun surat keluar yang kamu tambahkan
-                            akan tampil di tabel ini.
+                            @if(request('search') || request('status') || request('tanggal_awal'))
+                                Tidak ada surat yang cocok dengan filter yang dipilih.
+                                <br>Coba ubah kata kunci atau reset filter.
+                            @else
+                                Surat yang ditambahkan akan muncul di sini.
+                            @endif
                         </p>
-                        <a href="{{ route('surat.create') }}" class="btn-tambah-sm">
-                            <i class="bi bi-plus-circle"></i> Tambah Surat Sekarang
-                        </a>
+                        @if(request('search') || request('status') || request('tanggal_awal'))
+                            <a href="{{ route('surat.index') }}" class="btn btn-ghost mt-2 mb-3">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Reset Filter
+                            </a>
+                        @else
+                            <a href="{{ route('surat.create') }}" class="btn-tambah-sm">
+                                <i class="bi bi-plus-circle"></i> Tambah Surat Sekarang
+                            </a>
+                        @endif
                     </div>
                 </td>
             </tr>

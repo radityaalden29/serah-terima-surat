@@ -30,13 +30,14 @@
             </div>
 
             <div class="feature-list">
-                <div class="feature-item"><i class="bi bi-check2-circle"></i> Dashboard</div>
-                <div class="feature-item"><i class="bi bi-check2-circle"></i> Tambah Surat</div>
-                <div class="feature-item"><i class="bi bi-check2-circle"></i> Data Surat</div>
-                <div class="feature-item"><i class="bi bi-check2-circle"></i> Edit Surat</div>
-                <div class="feature-item"><i class="bi bi-check2-circle"></i> Hapus Surat</div>
-                <div class="feature-item"><i class="bi bi-check2-circle"></i> Laporan</div>
-                <div class="feature-item"><i class="bi bi-check2-circle"></i> Statistik Surat</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Dashboard & Statistik</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Tambah & Edit Surat</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Data Surat (CRUD)</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Impor Excel & Template</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Laporan PDF & Excel</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Log Aktivitas & Audit</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Preview Lampiran PDF</div>
+                <div class="feature-item"><i class="bi bi-check2-circle"></i> Notifikasi Surat Hari Ini</div>
             </div>
         </div>
 
@@ -96,8 +97,31 @@
                 <div class="timeline-item">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <span class="timeline-version">v1.3</span>
+                        <span class="timeline-version">v1.5</span>
                         <span class="timeline-date">Terbaru</span>
+                        <p>Fitur dark mode dihapus untuk menjaga konsistensi tampilan. Antarmuka kini sepenuhnya menggunakan tema terang.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-version">v1.4</span>
+                        <p>
+                            Log Aktivitas dilengkapi statistik per aksi, filter pencarian, dan export Excel.
+                            Laporan mendapat filter tambahan (pengirim, penerima, status).
+                            Dashboard menampilkan notifikasi surat yang jatuh tempo hari ini.
+                            Preview lampiran PDF diperkuat dengan tombol unduh dan fallback otomatis.
+                            Konfirmasi dialog sebelum meninggalkan form yang belum disimpan.
+                            Empty state di seluruh halaman diperbaiki dengan pesan kontekstual.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-version">v1.3</span>
                         <p>Mode gelap, breadcrumb navigasi, notifikasi toast, dan animasi interaktif di berbagai halaman.</p>
                     </div>
                 </div>

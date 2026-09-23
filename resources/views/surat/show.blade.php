@@ -81,20 +81,44 @@
                 <div class="detail-label">Lampiran</div>
                 <div class="detail-value w-100">
                     @if($surat->lampiran)
-                        <a href="{{ asset('storage/'.$surat->lampiran) }}" target="_blank" class="btn btn-soft-danger mb-3">
-                            <i class="bi bi-box-arrow-up-right"></i> Buka di Tab Baru
-                        </a>
+                        <div class="d-flex gap-2 mb-3">
+                            <a href="{{ asset('storage/'.$surat->lampiran) }}"
+                               target="_blank"
+                               class="btn btn-soft-danger">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Buka di Tab Baru
+                            </a>
+                            <a href="{{ asset('storage/'.$surat->lampiran) }}"
+                               download
+                               class="btn btn-ghost">
+                                <i class="bi bi-download me-1"></i> Unduh PDF
+                            </a>
+                        </div>
 
-                        <div class="pdf-preview-wrapper">
+                        <div class="pdf-preview-wrapper" id="pdfWrapper">
                             <iframe
-                                src="{{ asset('storage/'.$surat->lampiran) }}"
+                                src="{{ asset('storage/'.$surat->lampiran) }}#toolbar=1&view=FitH"
                                 title="Preview Lampiran PDF"
                                 class="pdf-preview-frame"
+                                id="pdfFrame"
                                 loading="lazy">
                             </iframe>
                         </div>
+
+                        {{-- Fallback: muncul jika iframe gagal load (browser mobile/tertentu) --}}
+                        <div id="pdfFallback" class="d-none mt-3 p-4 text-center"
+                             style="border:1px dashed var(--border-color);border-radius:14px;">
+                            <i class="bi bi-file-earmark-pdf display-5 text-danger d-block mb-2"></i>
+                            <p class="text-muted mb-3">Browser kamu tidak mendukung preview PDF inline.</p>
+                            <a href="{{ asset('storage/'.$surat->lampiran) }}" target="_blank" class="btn btn-soft-danger">
+                                <i class="bi bi-box-arrow-up-right me-1"></i> Buka PDF
+                            </a>
+                        </div>
                     @else
-                        <span class="text-muted">Tidak ada lampiran.</span>
+                        <div class="d-flex align-items-center gap-3 p-4"
+                             style="border:1px dashed var(--border-color);border-radius:14px;">
+                            <i class="bi bi-paperclip fs-3 text-muted"></i>
+                            <span class="text-muted">Tidak ada lampiran untuk surat ini.</span>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -103,5 +127,40 @@
 
     </div>
 </div>
+
+@push('scripts')
+<script>
+// Deteksi jika iframe PDF gagal dimuat (browser mobile/tertentu)
+document.addEventListener('DOMContentLoaded', function () {
+    const frame = document.getElementById('pdfFrame');
+    const fallback = document.getElementById('pdfFallback');
+    if (!frame || !fallback) return;
+
+    // Timeout: jika iframe tidak merespons dalam 4 detik, tampilkan fallback
+    const timer = setTimeout(function () {
+        fallback.classList.remove('d-none');
+    }, 4000);
+
+    frame.addEventListener('load', function () {
+        clearTimeout(timer);
+        try {
+            // Cek apakah konten benar-benar termuat (bukan halaman error)
+            const doc = frame.contentDocument || frame.contentWindow.document;
+            if (!doc || doc.title === '404' || doc.body?.innerHTML?.includes('not found')) {
+                fallback.classList.remove('d-none');
+            }
+        } catch (e) {
+            // Cross-origin — berarti PDF berhasil dimuat oleh browser
+            clearTimeout(timer);
+        }
+    });
+
+    frame.addEventListener('error', function () {
+        clearTimeout(timer);
+        fallback.classList.remove('d-none');
+    });
+});
+</script>
+@endpush
 
 @endsection
