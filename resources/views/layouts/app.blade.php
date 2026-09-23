@@ -409,14 +409,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const greetingEl = document.getElementById('dynamicGreeting');
     if (greetingEl) {
         const hour = new Date().getHours();
-        let greeting = 'Selamat malam';
+        let greeting = 'Selamat malam, selamat datang';
 
         if (hour >= 4 && hour < 11) {
-            greeting = 'Selamat pagi';
+            greeting = 'Selamat pagi, selamat datang';
         } else if (hour >= 11 && hour < 15) {
-            greeting = 'Selamat siang';
+            greeting = 'Selamat siang, selamat datang';
         } else if (hour >= 15 && hour < 19) {
-            greeting = 'Selamat sore';
+            greeting = 'Selamat sore, selamat datang';
         }
 
         greetingEl.textContent = greeting;
